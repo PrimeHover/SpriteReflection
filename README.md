@@ -1,4 +1,4 @@
-# PH_SpriteReflection
+# PH_SpriteReflection.js
 This plugin allows you to reflect any character in the water.
 
 ### How to Use
@@ -31,7 +31,7 @@ This plugin allows you to reflect any character in the water.
 * In the Note section, you should follow the pattern below:
 
     ``<PH>``
-    
+
     ``[commands]``
 
     ``</PH>``
@@ -40,7 +40,7 @@ This plugin allows you to reflect any character in the water.
     * ``WaterN={distance:scale:opacity:blend}``: Sets a rule for a specific water tileset (A1 tileset)
     * ``BridgeN={distance:scale:opacity:blend}``: Sets a rule for a bridge tileset (B, C, D, E tilesets)
 * Change the following parameters for the actual numbers you want to set:
-    * ``N`` = Corresponding number of the Terrain Tag (From 1 to 7).
+    * ``N`` = Terrain Tag number (From 1 to 7).
     * ``distance`` = The distance between the reflection in the water and the actual character
     * ``scale`` = Scale factor of the reflections (%) (resize the reflection)
     * ``opacity`` = Opacity value for the reflections (From 0 to 255)
