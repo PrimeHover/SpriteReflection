@@ -3,15 +3,15 @@
  PH - Sprite Reflection
  @plugindesc This plugin allows you to reflect any character in the water.
  @author PrimeHover
- @version 1.0
- @date 11/24/2015
+ @version 1.1
+ @date 11/25/2015
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
  ---------------------------------------------------------------------------------------
 
- @param --Reflection Options--
+ @param --Reflection--
  @default
 
  @param Distance
@@ -29,6 +29,21 @@
  @param Blend Mode
  @desc Default blend more for the reflections (0: Normal, 1: Additive)
  @default 0
+
+ @param Small Water Tile
+ @desc Switch this option to choose whether or not you want the reflections in small water tiles appear (0: No, 1: Yes)
+ @default 0
+
+ @param --Window_Options--
+ @default
+
+ @param Add to Window_Options
+ @desc Adds an option for the player to turn on/off the reflections in all maps in the Options Menu (0: No, 1: Yes)
+ @default 0
+
+ @param Vocabulary Window_Options
+ @desc Text that will appear in the Window_Options
+ @default Reflections
 
  @help
 
@@ -116,6 +131,9 @@ PHPlugins.Params.PHSpriteReflectionDistance = Number(PHPlugins.Parameters['Dista
 PHPlugins.Params.PHSpriteReflectionScaleFactor = Number(PHPlugins.Parameters['Scale Factor']);
 PHPlugins.Params.PHSpriteReflectionOpacity = Number(PHPlugins.Parameters['Opacity']);
 PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blend Mode']);
+PHPlugins.Params.PHSpriteReflection1WaterTile = Number(PHPlugins.Parameters['Small Water Tile']);
+PHPlugins.Params.PHSpriteReflectionAddToOptions = Number(PHPlugins.Parameters['Add to Window_Options']);
+PHPlugins.Params.PHSpriteReflectionVocabularyOption = String(PHPlugins.Parameters['Vocabulary Window_Options']);
 
 (function() {
 
@@ -156,6 +174,10 @@ PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blen
 
     PHReflectionManager.prototype.getUnderActualTileId = function() {
         return [ $gameMap.tileId(this._actualPosition.x, this._actualPosition.y + 1, 0), $gameMap.tileId(this._actualPosition.x, this._actualPosition.y + 1, 3) ];
+    };
+
+    PHReflectionManager.prototype.getUnder2ActualTileId = function() {
+        return [ $gameMap.tileId(this._actualPosition.x, this._actualPosition.y + 2, 0), $gameMap.tileId(this._actualPosition.x, this._actualPosition.y + 2, 3) ];
     };
 
     PHReflectionManager.prototype.getUnderActualTerrainTag = function() {
@@ -221,6 +243,8 @@ PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blen
 
         this._underPreviousTileId = this.getUnderPreviousTileId();
         this._underActualTileId = this.getUnderActualTileId();
+        this._under2ActualTileId = this.getUnder2ActualTileId();
+
         this._underActualTerrainTag = this.getUnderActualTerrainTag();
         this._underPreviousTerrainTag = this.getUnderPreviousTerrainTag();
 
@@ -238,18 +262,26 @@ PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blen
 
     PHReflectionManager.prototype.checkMovement = function(wasMoving) {
         if (Tilemap.isWaterTile(this._underActualTileId[0])) {
-            if (Tilemap.isWaterTile(this._underPreviousTileId[0])) {
-                if (this._underActualTileId[1] == 0) {
-                    if (this._underPreviousTileId[1] == 0) {
-                        return true;
+            if (PHPlugins.Params.PHSpriteReflection1WaterTile == 1 || (Tilemap.isWaterTile(this._under2ActualTileId[0]) && PHPlugins.Params.PHSpriteReflection1WaterTile == 0)) {
+                if (Tilemap.isWaterTile(this._underPreviousTileId[0])) {
+                    if (this._underActualTileId[1] == 0) {
+                        if (PHPlugins.Params.PHSpriteReflection1WaterTile == 1 || (this._under2ActualTileId[1] == 0 && PHPlugins.Params.PHSpriteReflection1WaterTile == 0)) {
+                            if (this._underPreviousTileId[1] == 0) {
+                                return true;
+                            } else {
+                                return !wasMoving;
+                            }
+                        } else {
+                            return false;
+                        }
                     } else {
-                        return !wasMoving;
+                        return false;
                     }
                 } else {
-                    return false;
+                    return !wasMoving;
                 }
             } else {
-                return !wasMoving;
+                return false;
             }
         } else {
             return false;
@@ -257,7 +289,7 @@ PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blen
     };
 
     PHReflectionManager.prototype.checkPermission = function() {
-        if (!PHPlugins.PHSpriteReflection.noReflection.global) {
+        if (!PHPlugins.PHSpriteReflection.noReflection.global && ConfigManager.reflectionOption == true) {
             if (this._character instanceof Game_Player && !PHPlugins.PHSpriteReflection.noReflection.player) {
                 return true;
             }
@@ -456,6 +488,35 @@ PHPlugins.Params.PHSpriteReflectionBlendMode = Number(PHPlugins.Parameters['Blen
                     }
                     break;
             }
+        }
+    };
+
+
+
+    /* ---------------------------------------------------------- *
+     *              WINDOW_OPTIONS AND CONFIG MANAGER             *
+     * ---------------------------------------------------------- */
+
+    ConfigManager.reflectionOption = true;
+
+    var _ConfigManager_makeData = ConfigManager.makeData;
+    ConfigManager.makeData = function() {
+        var config = _ConfigManager_makeData.call(this);
+        config.reflectionOption = this.reflectionOption;
+        return config;
+    };
+
+    var _ConfigManager_applyData = ConfigManager.applyData;
+    ConfigManager.applyData = function(config) {
+        _ConfigManager_applyData.call(this, config);
+        this.reflectionOption = this.readFlag(config, 'reflectionOption');
+    };
+
+    var _Window_Options_prototype_addGeneralOptions = Window_Options.prototype.addGeneralOptions;
+    Window_Options.prototype.addGeneralOptions = function() {
+        _Window_Options_prototype_addGeneralOptions.call(this);
+        if (PHPlugins.Params.PHSpriteReflectionAddToOptions == 1) {
+            this.addCommand(PHPlugins.Params.PHSpriteReflectionVocabularyOption, 'reflectionOption');
         }
     };
 

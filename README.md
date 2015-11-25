@@ -12,6 +12,9 @@ This plugin allows you to reflect any character in the water.
 * ``Scale Factor``: Default scale factor of the reflections (%) (resize the reflection)
 * ``Opacity``: Default opacity value for the reflections (From 0 to 255)
 * ``Blend Mode``: Default blend more for the reflections (0: Normal, 1: Additive)
+* ``Small Water Tile``: Switch this option to choose whether or not you want the reflections in small water tiles appear (0: No, 1: Yes)
+* ``Add to Window_Options``: Adds an option for the player to turn on/off the reflections in all maps in the Options Menu (0: No, 1: Yes)
+* ``Vocabulary Window_Options``: Text that will appear in the Window_Options
 
 ### Plugin Commands:
 * ``PHSpriteReflection global on``: Turns on the reflection of everything
@@ -61,4 +64,5 @@ This plugin allows you to reflect any character in the water.
     * ``Bridge4={13:80:70:0}`` : Sets the terrain tag for a bridge tile, its distance, its scale, its opacity and its blend mode
 
 ### ChangeLog
+* 11/25/2015: Version 1.1 (Added option for the Player to turn on/off the reflections via Options Menu; Added parameter for choosing whether or not the reflections in small water tiles will appear).
 * 11/24/2015: Version 1.0
