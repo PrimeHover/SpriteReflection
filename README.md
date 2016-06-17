@@ -1,11 +1,14 @@
 # PH_SpriteReflection.js
 This plugin allows you to reflect any character in the water.
 
-### How to Use
+### Installation
 * Download the JS file and include it into the ```/plugins``` folder of your project.
 * Open the Plugin Manager, select the file **PH_SpriteReflection.js**, and turn it on.
 * Create some rules in the tilesets using the Terrain Tag to specify the properties of the reflection for each water tileset.
 * You are allowed to create some rules for bridges as well.
+
+### How to Use
+* You can check out the full documentation with all the rules, settings and examples in [HERE](http://primehover.gufernandes.com.br/ph-sprite-reflection).
 
 ### Parameters
 * ``Distance``: Default distance in pixels between the reflection in the water and the actual character
